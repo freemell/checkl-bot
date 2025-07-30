@@ -10,7 +10,6 @@ const triggerWords = [
   '@all',
   'is everyone here?',
   'tag everybody',
-  'everyone',
   'tag everyone',
   'call everyone',
   'summon all'
@@ -60,8 +59,8 @@ bot.on('message', async (msg) => {
       const mentions = await getChatMembersForTagging(chatId);
       
       if (mentions.length > 0) {
-        // Create simple message with mentions and "Hi"
-        const tagMessage = `${mentions.join(' ')} Hi!`;
+        // Create simple message with mentions and "Hiiii listen"
+        const tagMessage = `${mentions.join(' ')} Hiiii listen`;
         
         // Send the message
         await bot.sendMessage(chatId, tagMessage);

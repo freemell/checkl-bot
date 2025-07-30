@@ -10,7 +10,6 @@ const triggerWords = [
   '@all',
   'is everyone here?',
   'tag everybody',
-  'everyone',
   'tag everyone',
   'call everyone',
   'summon all'

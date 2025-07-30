@@ -1,0 +1,25 @@
+{
+  "name": "telegram-tag-bot",
+  "version": "1.0.0",
+  "description": "A Telegram bot that can tag everyone in a group",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js",
+    "dev": "nodemon bot.js",
+    "enhanced": "node bot-enhanced.js",
+    "improved": "node bot-improved.js",
+    "advanced": "node bot-advanced.js",
+    "simple": "node bot-simple.js",
+    "test": "node test-bot.js"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.64.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["telegram", "bot", "tag", "group"],
+  "author": "",
+  "license": "MIT"
+} 

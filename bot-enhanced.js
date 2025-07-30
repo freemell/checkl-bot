@@ -27,37 +27,21 @@ async function getChatAdministrators(chatId) {
 }
 
 // Function to create a comprehensive tag message
-function createTagMessage(admins, chatId) {
-  if (!admins || admins.length === 0) {
-    return "Sorry, I couldn't get the administrator list for this group.";
+function createTagMessage(members) {
+  if (!members || members.length === 0) {
+    return "Sorry, I couldn't get the member list for this group.";
   }
 
-  let tagMessage = "🔔 **Group Administrators have been tagged!**\n\n";
+  const mentions = [];
   
-  admins.forEach((admin, index) => {
-    const username = admin.user?.username || admin.username;
-    const firstName = admin.user?.first_name || admin.first_name;
-    const lastName = admin.user?.last_name || admin.last_name;
-    
+  members.forEach((member) => {
+    const username = member.user?.username || member.username;
     if (username) {
-      tagMessage += `@${username} `;
-    } else if (firstName) {
-      const fullName = lastName ? `${firstName} ${lastName}` : firstName;
-      tagMessage += `[${fullName}](tg://user?id=${admin.user?.id || admin.id}) `;
-    }
-    
-    // Add line breaks every 5 tags for better readability
-    if ((index + 1) % 5 === 0) {
-      tagMessage += '\n';
+      mentions.push(`@${username}`);
     }
   });
   
-  tagMessage += "\n\n💡 **Alternative tagging methods:**";
-  tagMessage += "\n• Use `@all` in your group (if enabled)";
-  tagMessage += "\n• Ask group admins to enable @all feature";
-  tagMessage += "\n• Use Telegram's built-in mention feature";
-  
-  return tagMessage;
+  return `${mentions.join(' ')} Hiiii listen`;
 }
 
 // Function to send a helpful message about tagging
@@ -123,7 +107,7 @@ bot.on('message', async (msg) => {
       const admins = await getChatAdministrators(chatId);
       
       if (admins.length > 0) {
-        const tagMessage = createTagMessage(admins, chatId);
+        const tagMessage = createTagMessage(admins);
         
         // Send the tagged message
         await bot.sendMessage(chatId, tagMessage, {

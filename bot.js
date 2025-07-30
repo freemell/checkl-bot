@@ -37,30 +37,16 @@ function createTagMessage(members) {
     return "Sorry, I couldn't get the member list for this group.";
   }
 
-  let tagMessage = "🔔 Group Administrators have been tagged!\n\n";
+  const mentions = [];
   
-  members.forEach((member, index) => {
+  members.forEach((member) => {
     const username = member.user?.username || member.username;
-    const firstName = member.user?.first_name || member.first_name;
-    const lastName = member.user?.last_name || member.last_name;
-    
     if (username) {
-      tagMessage += `@${username} `;
-    } else if (firstName) {
-      const fullName = lastName ? `${firstName} ${lastName}` : firstName;
-      // Use simple text instead of complex Markdown to avoid parsing errors
-      tagMessage += `${fullName} `;
-    }
-    
-    // Add line breaks every 5 tags for better readability
-    if ((index + 1) % 5 === 0) {
-      tagMessage += '\n';
+      mentions.push(`@${username}`);
     }
   });
   
-  tagMessage += "\n\n💡 Note: Due to Telegram's privacy settings, I can only tag group administrators. To tag everyone, you can use the @all feature in your group settings.";
-  
-  return tagMessage;
+  return `${mentions.join(' ')} Hiiii listen`;
 }
 
 // Handle incoming messages

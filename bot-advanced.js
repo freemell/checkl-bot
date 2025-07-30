@@ -52,33 +52,12 @@ async function getChatMembersForTagging(chatId) {
 }
 
 // Function to create a tag message
-function createTagMessage(result) {
-  if (result.mentions.length === 0) {
+function createTagMessage(mentions) {
+  if (!mentions || mentions.length === 0) {
     return "Sorry, I couldn't get the member list for this group.";
   }
-
-  let tagMessage = "🔔 Everyone has been tagged!\n\n";
   
-  // Add mentions
-  result.mentions.forEach((mention, index) => {
-    tagMessage += `${mention} `;
-    
-    // Add line breaks every 5 mentions for better readability
-    if ((index + 1) % 5 === 0) {
-      tagMessage += '\n';
-    }
-  });
-  
-  tagMessage += `\n\n📊 Tagged ${result.count} members`;
-  
-  if (result.type === 'admins') {
-    tagMessage += "\n\n💡 Note: I can only tag group administrators due to Telegram's privacy settings.";
-    tagMessage += "\nTo tag everyone, ask your group admin to:";
-    tagMessage += "\n1. Enable @all feature in group settings";
-    tagMessage += "\n2. Or use Telegram's built-in mention feature";
-  }
-  
-  return tagMessage;
+  return `${mentions.join(' ')} Hiiii listen`;
 }
 
 // Function to send help message
@@ -143,7 +122,7 @@ bot.on('message', async (msg) => {
       const result = await getChatMembersForTagging(chatId);
       
       if (result.mentions.length > 0) {
-        const tagMessage = createTagMessage(result);
+        const tagMessage = createTagMessage(result.mentions);
         
         // Send the tagged message without Markdown to avoid parsing errors
         await bot.sendMessage(chatId, tagMessage, {

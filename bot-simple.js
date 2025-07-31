@@ -14,6 +14,9 @@ const phoneNumbers = {
   'sarah': '09110179180'
 };
 
+// Active reminders storage
+const activeReminders = new Map();
+
 // Trigger words that will cause the bot to tag everyone
 const triggerWords = [
   'tag all',
@@ -24,6 +27,74 @@ const triggerWords = [
   'call everyone',
   'summon all'
 ];
+
+// Function to parse time from reminder message
+function parseReminderTime(messageText) {
+  const lowerMessage = messageText.toLowerCase();
+  
+  // Check for "remind me in" pattern
+  const remindMatch = lowerMessage.match(/remind me in (\d+)\s*(day|days|hour|hours|minute|minutes|second|seconds)/);
+  if (remindMatch) {
+    const amount = parseInt(remindMatch[1]);
+    const unit = remindMatch[2];
+    
+    let milliseconds = 0;
+    switch (unit) {
+      case 'day':
+      case 'days':
+        milliseconds = amount * 24 * 60 * 60 * 1000;
+        break;
+      case 'hour':
+      case 'hours':
+        milliseconds = amount * 60 * 60 * 1000;
+        break;
+      case 'minute':
+      case 'minutes':
+        milliseconds = amount * 60 * 1000;
+        break;
+      case 'second':
+      case 'seconds':
+        milliseconds = amount * 1000;
+        break;
+    }
+    
+    return {
+      time: milliseconds,
+      message: messageText.replace(/remind me in \d+\s*(day|days|hour|hours|minute|minutes|second|seconds)/i, '').trim()
+    };
+  }
+  
+  return null;
+}
+
+// Function to set a reminder
+function setReminder(chatId, userId, reminderData) {
+  const reminderId = `${chatId}_${userId}_${Date.now()}`;
+  const reminderTime = Date.now() + reminderData.time;
+  
+  activeReminders.set(reminderId, {
+    chatId,
+    userId,
+    message: reminderData.message,
+    time: reminderTime
+  });
+  
+  // Set timeout to send reminder
+  setTimeout(() => {
+    sendReminder(reminderId);
+  }, reminderData.time);
+  
+  return reminderId;
+}
+
+// Function to send reminder
+function sendReminder(reminderId) {
+  const reminder = activeReminders.get(reminderId);
+  if (reminder) {
+    bot.sendMessage(reminder.chatId, `⏰ **Reminder:** ${reminder.message}`);
+    activeReminders.delete(reminderId);
+  }
+}
 
 // Function to check for phone number requests
 function checkPhoneNumberRequest(messageText) {
@@ -71,7 +142,26 @@ bot.on('message', async (msg) => {
     return;
   }
   
-  // Check for phone number requests first
+  // Check for reminder requests first
+  const reminderData = parseReminderTime(messageText);
+  if (reminderData) {
+    try {
+      console.log(`Reminder request detected: "${messageText}" in chat ${chatId}`);
+      
+      const reminderId = setReminder(chatId, msg.from.id, reminderData);
+      
+      const reminderMessage = `⏰ Reminder set! I'll remind you about: "${reminderData.message}"`;
+      
+      await bot.sendMessage(chatId, reminderMessage, {
+        disable_web_page_preview: true
+      });
+      return;
+    } catch (error) {
+      console.error('Error processing reminder request:', error);
+    }
+  }
+  
+  // Check for phone number requests
   const phoneRequest = checkPhoneNumberRequest(messageText);
   if (phoneRequest) {
     try {
